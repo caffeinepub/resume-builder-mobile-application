@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-print-pdf-export-so-the-generated-pdf-contains-the-currently-edited-resume-content-by-ensuring-the-print-view-is-actually-visible-to-the-browser-during-printing-do-not-hide-the-entire-react-root-container-during-media-print",
-      "featureTitle": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
+      "featureId": "feature-add-an-in-app-install-popup-that-is-shown-to-android-users-when-the-pwa-is-installable-native-beforeinstallprompt-is-available-and-the-app-is-not-already-installed-offering-a-direct-install-action-that-triggers-the-browser-install-prompt",
+      "featureTitle": "Add an in-app install popup that is shown to Android users when the PWA is installable (native beforeinstallprompt is available) and the app is not already installed, offering a direct \"Install\" action that triggers the browser install prompt.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/ResumeEditor.tsx",
-        "frontend/src/utils/pdfExport.ts"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/components/pwa/AndroidInstallPopup.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,11 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-draft-handling-in-the-resume-editor-so-the-correct-draft-is-initialized-and-updated-reliably-when-the-loaded-resume-changes-e-g-navigating-between-different-resume-ids-and-ensure-draft-state-cannot-get-stuck-in-a-non-processing-state",
-      "featureTitle": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
+      "featureId": "feature-implement-dismissal-and-frequency-controls-for-the-android-install-popup-so-users-are-not-repeatedly-interrupted",
+      "featureTitle": "Implement dismissal and frequency controls for the Android install popup so users are not repeatedly interrupted.",
       "files": [
-        "frontend/src/hooks/useResumes.ts",
-        "frontend/src/pages/ResumeEditor.tsx"
+        "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+        "frontend/src/hooks/useAndroidInstallPopupCooldown.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -45,13 +44,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-offline-first-draft-syncing-so-queued-draft-resume-operations-are-not-lost-do-not-clear-the-entire-sync-queue-when-one-or-more-operations-fail-and-ensure-only-successfully-processed-operations-are-removed-from-the-queue",
-      "featureTitle": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "featureId": "feature-limit-the-android-install-popup-to-android-devices-browsers-and-ensure-it-does-not-appear-on-ios-or-desktop",
+      "featureTitle": "Limit the Android install popup to Android devices/browsers and ensure it does not appear on iOS or desktop.",
       "files": [
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/components/SyncStatusBadge.tsx",
-        "frontend/src/hooks/useResumes.ts",
-        "frontend/src/storage/resumeSyncQueue.ts"
+        "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+        "frontend/src/utils/platform.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -64,29 +61,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-improve-user-facing-error-handling-for-pdf-export-and-draft-sync-processing-failures-by-displaying-clear-english-error-messages-in-the-ui-when-operations-fail-save-sync-retry-or-print-export",
-      "featureTitle": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
-      "files": [
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/hooks/useResumes.ts",
-        "frontend/src/pages/ResumeEditor.tsx",
-        "frontend/src/utils/errorMessage.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }

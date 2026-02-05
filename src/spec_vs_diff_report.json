@@ -1,57 +1,25 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T13:01:19.602Z",
-  "summary": "Diff implements several requested reliability fixes: adds print media CSS for `.print-only`, improves draft initialization/reset in ResumeEditor, introduces partial sync-queue removal utilities and reactive queue-change notifications, and adds user-facing toast/error messaging for save/sync/PDF flows. However, the diff summary does not provide enough evidence that the dedicated print view is actually mounted/visible during printing, nor that sync processing logic removes only successful operations (as opposed to having the utilities available).",
-  "missing_requirements": [
-    {
-      "id": "REQ-1",
-      "requirement": "Ensure the print view is actually visible to the browser during printing so the exported PDF contains the currently edited resume content (do not hide the entire React root/container during @media print).",
-      "reason": "The diff shows print CSS toggling `.print-only` visibility, but the ResumeEditor render is truncated and does not confirm that a `.print-only` ResumePrintView is mounted in the DOM at print time or that the previously-hidden root/container behavior was removed. CSS alone does not prove the print view is present/visible during `window.print()`.",
-      "evidence": [
-        "frontend/src/index.css",
-        "frontend/src/pages/ResumeEditor.tsx (truncated)",
-        "frontend/src/utils/pdfExport.ts"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Do not clear the entire sync queue when one or more operations fail; remove only successfully processed operations and keep failed ones queued for retry; update last-sync time on full successful sync.",
-      "reason": "Queue utilities now support partial removal and last-sync updates only when queue becomes empty, but the core sync-processing implementation (likely in `useResumes.ts`) is truncated, so it is not verifiable from the provided diff that failed operations are retained and only successful ones removed during actual sync runs.",
-      "evidence": [
-        "frontend/src/storage/resumeSyncQueue.ts",
-        "frontend/src/hooks/useResumes.ts (truncated)",
-        "frontend/src/components/AppLayout.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-05T13:58:06.781Z",
+  "summary": "Diff adds an Android-gated PWA install popup component wired to the existing usePwaInstall() flow, plus a localStorage-based dismissal cooldown hook, and mounts the popup in AppLayout. Overall, REQ-1/REQ-2/REQ-3 appear implemented based on the provided diff summary.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Global theme/token overhaul and extensive OKLCH color theme definitions not directly required for PDF export/draft/sync fixes.",
-      "reason": "BuildRequest focuses on print/PDF visibility, draft initialization, sync queue reliability, and error messaging—no requirement mentions changing the app’s theme tokens or color system.",
+      "description": "Added extra platform detection helpers (isIOS, isDesktop) that are not used by the popup gating logic and were not explicitly requested.",
+      "reason": "BuildRequest only requires limiting the popup to Android; implementing additional platform utilities beyond isAndroid is extra scope (though related).",
       "evidence": [
-        "frontend/src/index.css"
-      ]
-    },
-    {
-      "description": "Added/expanded sync status tooltip content (last sync time + pending changes) beyond explicit requirements.",
-      "reason": "While related to syncing, REQ-3/REQ-4 do not ask for new badge/tooltip UI features; they ask for reliability and clear error messages. This appears to be an extra UX enhancement.",
-      "evidence": [
-        "frontend/src/components/SyncStatusBadge.tsx"
+        "frontend/src/utils/platform.ts"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/AppLayout.tsx",
-    "frontend/src/components/SyncStatusBadge.tsx",
-    "frontend/src/hooks/useResumes.ts",
-    "frontend/src/index.css",
-    "frontend/src/pages/ResumeEditor.tsx",
-    "frontend/src/storage/resumeSyncQueue.ts",
-    "frontend/src/utils/errorMessage.ts",
-    "frontend/src/utils/pdfExport.ts",
+    "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+    "frontend/src/hooks/useAndroidInstallPopupCooldown.ts",
+    "frontend/src/utils/platform.ts",
     "project_state.json"
   ]
 }

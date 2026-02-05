@@ -1,75 +1,52 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T13:01:19.642Z",
+  "generatedAt": "2026-02-05T13:58:06.815Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
+        "summary": "Add an in-app install popup that is shown to Android users when the PWA is installable (native beforeinstallprompt is available) and the app is not already installed, offering a direct \"Install\" action that triggers the browser install prompt.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/utils/pdfExport.ts"
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+          "frontend/src/components/AppLayout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/utils/pdfExport.ts"
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+          "frontend/src/components/AppLayout.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
+        "summary": "Implement dismissal and frequency controls for the Android install popup so users are not repeatedly interrupted.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/hooks/useResumes.ts"
+          "frontend/src/hooks/useAndroidInstallPopupCooldown.ts",
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/hooks/useResumes.ts"
+          "frontend/src/hooks/useAndroidInstallPopupCooldown.ts",
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+        "summary": "Limit the Android install popup to Android devices/browsers and ensure it does not appear on iOS or desktop.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/storage/resumeSyncQueue.ts",
-          "frontend/src/hooks/useResumes.ts",
-          "frontend/src/components/SyncStatusBadge.tsx",
-          "frontend/src/components/AppLayout.tsx"
+          "frontend/src/utils/platform.ts",
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/storage/resumeSyncQueue.ts",
-          "frontend/src/hooks/useResumes.ts",
-          "frontend/src/components/SyncStatusBadge.tsx",
-          "frontend/src/components/AppLayout.tsx"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/hooks/useResumes.ts",
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/utils/errorMessage.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/hooks/useResumes.ts",
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/utils/errorMessage.ts"
+          "frontend/src/utils/platform.ts",
+          "frontend/src/components/pwa/AndroidInstallPopup.tsx"
         ]
       }
     ]
@@ -80,13 +57,9 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/AppLayout.tsx",
-    "frontend/src/components/SyncStatusBadge.tsx",
-    "frontend/src/hooks/useResumes.ts",
-    "frontend/src/index.css",
-    "frontend/src/pages/ResumeEditor.tsx",
-    "frontend/src/storage/resumeSyncQueue.ts",
-    "frontend/src/utils/errorMessage.ts",
-    "frontend/src/utils/pdfExport.ts",
+    "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+    "frontend/src/hooks/useAndroidInstallPopupCooldown.ts",
+    "frontend/src/utils/platform.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

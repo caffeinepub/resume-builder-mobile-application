@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 23,
+  "projectStateVersion": 35,
   "summary": "Internet Computer (Motoko + React) resume builder app with Internet Identity authentication, user profiles, offline-first resume editing, and backend storage/sync (including blob storage for assets).",
   "existing_features": [
     {
@@ -104,39 +104,50 @@
       "version": 1
     },
     {
-      "id": "feature-fix-the-print-pdf-export-so-the-generated-pdf-contains-the-currently-edited-resume-content-by-ensuring-the-print-view-is-actually-visible-to-the-browser-during-printing-do-not-hide-the-entire-react-root-container-during-media-print",
-      "title": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
+      "id": "IF-10",
+      "title": "PWA installability (web manifest, service worker, and app icons)",
+      "synonyms": [
+        "Progressive Web App",
+        "PWA manifest",
+        "Service worker"
+      ],
+      "description": "Adds PWA support via a web app manifest, service worker registration/asset, and required app icons (including Apple touch icon) to enable installability and improved offline/browser integration.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-install-popup-that-is-shown-to-android-users-when-the-pwa-is-installable-native-beforeinstallprompt-is-available-and-the-app-is-not-already-installed-offering-a-direct-install-action-that-triggers-the-browser-install-prompt",
+      "title": "Add an in-app install popup that is shown to Android users when the PWA is installable (native beforeinstallprompt is available) and the app is not already installed, offering a direct \"Install\" action that triggers the browser install prompt.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-draft-handling-in-the-resume-editor-so-the-correct-draft-is-initialized-and-updated-reliably-when-the-loaded-resume-changes-e-g-navigating-between-different-resume-ids-and-ensure-draft-state-cannot-get-stuck-in-a-non-processing-state",
-      "title": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
+      "id": "feature-implement-dismissal-and-frequency-controls-for-the-android-install-popup-so-users-are-not-repeatedly-interrupted",
+      "title": "Implement dismissal and frequency controls for the Android install popup so users are not repeatedly interrupted.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-offline-first-draft-syncing-so-queued-draft-resume-operations-are-not-lost-do-not-clear-the-entire-sync-queue-when-one-or-more-operations-fail-and-ensure-only-successfully-processed-operations-are-removed-from-the-queue",
-      "title": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "id": "feature-limit-the-android-install-popup-to-android-devices-browsers-and-ensure-it-does-not-appear-on-ios-or-desktop",
+      "title": "Limit the Android install popup to Android devices/browsers and ensure it does not appear on iOS or desktop.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-improve-user-facing-error-handling-for-pdf-export-and-draft-sync-processing-failures-by-displaying-clear-english-error-messages-in-the-ui-when-operations-fail-save-sync-retry-or-print-export",
-      "title": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add an in-app Android install prompt/popup to trigger or guide PWA installation when eligible.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
   "architectural_notes": [
     "Frontend: React + Vite + Tailwind with shadcn-ui component library scaffolded in build-template.",
     "Authentication: Internet Identity used on frontend; backend uses authorization/access-control modules (mixin-based) to gate methods.",
@@ -146,58 +157,32 @@
     "Blob storage module updated to component:blob-storage:v4.0.0 and re-wired through backend main canister.",
     "Build template standardized as component:build-template-react:v1.0.0 with expanded shadcn-ui component set and custom ESLint rules for ICP/II constraints.",
     "Build/deploy tooling refreshed (Dockerfile, icp.yaml, deploy.sh, image resize/prune scripts) under core infrastructure component:core-infrastructure:v1.0.2.",
-    "Resume rendering includes template-based preview + dedicated print view with client-side PDF/print export utility."
+    "Resume rendering includes template-based preview + dedicated print view with client-side PDF/print export utility.",
+    "PWA support added: web manifest + service worker (sw.js) + generated app icons (PWA + Apple touch) for installability and offline-friendly shell behavior."
   ],
-  "known_issues": [
-    "PDF export/print view does not include the created resume content (generated PDF is missing edited data).",
-    "Draft processing is failing (draft not processing as expected)."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "generatedImages": [
     {
-      "filename": "frontend/public/assets/generated/hero.dim_1600x900.png",
-      "description": "Generated hero image asset",
-      "targetWidth": 1600,
-      "targetHeight": 900
+      "filename": "frontend/public/assets/generated/apple-touch-icon.dim_180x180.png",
+      "description": "Generated Apple touch icon for PWA/install",
+      "targetWidth": 180,
+      "targetHeight": 180
     },
     {
-      "filename": "frontend/public/assets/generated/logo.dim_512x512.png",
-      "description": "Generated logo asset",
+      "filename": "frontend/public/assets/generated/pwa-icon-192.dim_192x192.png",
+      "description": "Generated PWA icon (192x192)",
+      "targetWidth": 192,
+      "targetHeight": 192
+    },
+    {
+      "filename": "frontend/public/assets/generated/pwa-icon-512.dim_512x512.png",
+      "description": "Generated PWA icon (512x512)",
       "targetWidth": 512,
       "targetHeight": 512
-    },
-    {
-      "filename": "frontend/public/assets/generated/template-ats-thumb.dim_600x800.png",
-      "description": "Generated template thumbnail (ATS)",
-      "targetWidth": 600,
-      "targetHeight": 800
-    },
-    {
-      "filename": "frontend/public/assets/generated/template-creative-thumb.dim_600x800.png",
-      "description": "Generated template thumbnail (Creative)",
-      "targetWidth": 600,
-      "targetHeight": 800
-    },
-    {
-      "filename": "frontend/public/assets/generated/template-minimal-thumb.dim_600x800.png",
-      "description": "Generated template thumbnail (Minimal)",
-      "targetWidth": 600,
-      "targetHeight": 800
-    },
-    {
-      "filename": "frontend/public/assets/generated/template-modern-thumb.dim_600x800.png",
-      "description": "Generated template thumbnail (Modern)",
-      "targetWidth": 600,
-      "targetHeight": 800
-    },
-    {
-      "filename": "frontend/public/assets/generated/template-professional-thumb.dim_600x800.png",
-      "description": "Generated template thumbnail (Professional)",
-      "targetWidth": 600,
-      "targetHeight": 800
     }
   ],
-  "projectName": "Fix PDF export missing resume content and repair draft/sync processing",
+  "projectName": "Add Android PWA install popup",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

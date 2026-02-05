@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
 import ProfileSetupDialog from './ProfileSetupDialog';
+import AndroidInstallPopup from './pwa/AndroidInstallPopup';
 import { useSyncPendingChanges } from '../hooks/useResumes';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
@@ -42,6 +43,7 @@ export default function AppLayout() {
       </main>
       <AppFooter />
       <ProfileSetupDialog />
+      <AndroidInstallPopup />
     </div>
   );
 }

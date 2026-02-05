@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { FileText } from 'lucide-react';
 import AuthControls from './AuthControls';
 import SyncStatusBadge from './SyncStatusBadge';
+import PwaInstallControl from './pwa/PwaInstallControl';
 
 export default function AppHeader() {
   return (
@@ -12,6 +13,7 @@ export default function AppHeader() {
           <span>Resume Builder</span>
         </Link>
         <div className="flex items-center gap-4">
+          <PwaInstallControl />
           <SyncStatusBadge />
           <AuthControls />
         </div>

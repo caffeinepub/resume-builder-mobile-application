@@ -7,8 +7,8 @@
   "frontend/src/hooks/useCurrentUserProfile.ts": "React Query hook for fetching caller user profile with proper loading state management to prevent modal flash.",
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profile management and resume CRUD operations.",
   "frontend/src/hooks/useResumes.ts": "Unified resume management hooks with partial-success sync processing that retains failed operations in queue while removing successful ones, and improved error propagation.",
-  "frontend/src/components/AppLayout.tsx": "Root layout with automatic sync trigger on reconnect that displays user-facing success/warning/error messages for sync operations via toast notifications.",
-  "frontend/src/components/AppHeader.tsx": "Application header with logo, navigation, sync status badge, and authentication controls.",
+  "frontend/src/components/AppLayout.tsx": "Root layout with automatic sync trigger on reconnect, profile setup dialog, and Android install popup that displays user-facing success/warning/error messages for sync operations via toast notifications.",
+  "frontend/src/components/AppHeader.tsx": "Application header with logo, navigation, PWA install control, sync status badge, and authentication controls.",
   "frontend/src/components/AppFooter.tsx": "Footer component with copyright attribution and privacy policy link.",
   "frontend/src/components/AuthControls.tsx": "Authentication UI component for Internet Identity login/logout with user profile display.",
   "frontend/src/components/ProfileSetupDialog.tsx": "Modal dialog for first-time user name capture after Internet Identity login.",
@@ -34,5 +34,13 @@
   "frontend/src/components/resume/ResumePreview.tsx": "Live preview component showing scaled-down resume with current draft content and formatting in a sticky card.",
   "frontend/src/components/resume/ResumePrintView.tsx": "Print-only view component that renders the resume template for PDF export without app UI chrome.",
   "frontend/src/utils/pdfExport.ts": "PDF export utility with defensive validation checks for resume content and title, proper error handling and re-throwing for caller notification.",
-  "frontend/index.html": "HTML entry point with Google Fonts preloaded for all supported resume fonts (Inter, Roboto, Lora, Playfair Display, Source Sans Pro)."
+  "frontend/index.html": "HTML entry point with PWA manifest link, theme-color meta tags, Apple touch icon, mobile web app meta tags, and inline service worker registration script.",
+  "frontend/public/manifest.webmanifest": "PWA manifest with app metadata, standalone display mode, theme colors, and icon references for installability on mobile and desktop platforms.",
+  "frontend/public/sw.js": "Service worker implementing network-first caching strategy with offline fallback, app shell caching on install, and SPA navigation handling for deep links.",
+  "frontend/src/hooks/usePwaInstall.ts": "React hook that captures the beforeinstallprompt event, detects standalone/installed state via display-mode media query and navigator.standalone, and provides methods to trigger native install prompts with proper state management to prevent UI flicker.",
+  "frontend/src/components/pwa/PwaInstallInstructionsDialog.tsx": "Dialog component displaying platform-specific installation instructions for iOS Safari, Android Chrome, and Desktop browsers with clear step-by-step guidance using shadcn/ui Dialog primitives.",
+  "frontend/src/components/pwa/PwaInstallControl.tsx": "Header control component that conditionally renders an Install button triggering native prompts on Chromium browsers or an instructions dialog on other platforms, hidden when app is already installed or state is not ready.",
+  "frontend/src/utils/platform.ts": "Platform detection utilities that identify Android, iOS, and desktop devices using user agent and pointer media queries for gating platform-specific UI.",
+  "frontend/src/hooks/useAndroidInstallPopupCooldown.ts": "React hook managing install popup dismissal state in localStorage with 7-day cooldown period and methods to dismiss or clear the cooldown when app is installed.",
+  "frontend/src/components/pwa/AndroidInstallPopup.tsx": "Android-only PWA install popup dialog that auto-opens when app is installable, triggers native install prompt, handles dismissal with cooldown, and clears state on successful installation."
 }

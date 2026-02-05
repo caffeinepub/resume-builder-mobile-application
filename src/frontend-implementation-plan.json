@@ -1,114 +1,68 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix resume PDF export print visibility and improve draft/sync reliability",
+  "title": "Android-only PWA in-app install popup with dismissal cooldown",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Ensure PDF/print export includes the currently edited resume by keeping the print view visible during printing while hiding it during normal screen rendering.",
+      "summary": "Show an in-app Android install popup when the PWA is installable and not yet installed, with an Install action that triggers the existing install prompt flow.",
       "acceptanceCriteria": [
-        "Clicking “Download PDF” from the Resume Editor prints/exports a PDF that matches the on-screen preview content for the current draft (including any unsaved edits if the user chooses not to save).",
-        "The print stylesheet no longer hides the entire app root (e.g., #root) such that `.print-only` content is excluded from printing.",
-        "On screen (non-print), the print-only resume view is not visibly rendered (no duplicate resume displayed)."
+        "On Android (Chrome/Chromium), when `usePwaInstall().canInstall` is true and `isInstalled` is false, a popup is displayed to the user without requiring them to click the existing header install control.",
+        "The popup has an \"Install\" button that calls the existing `promptInstall()` flow and, after successful install, the popup is no longer shown.",
+        "If the app is already installed (`display-mode: standalone` or equivalent), the popup never shows."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update @media print rules so the React root/container is not hidden during printing (avoid hiding body > * wholesale). Ensure only non-print content is hidden while `.print-only` remains printable. Also add a non-print rule to hide `.print-only` on screen to prevent duplicate rendering."
+          "path": "frontend/src/components/pwa/AndroidInstallPopup.tsx",
+          "operation": "create",
+          "description": "Create an Android-focused in-app install popup component that uses the existing `usePwaInstall()` hook (canInstall/isInstalled/promptInstall) to auto-open when install is available and to trigger `promptInstall()` from an \"Install\" button; ensure it closes permanently once installation succeeds. Use existing shadcn dialog primitives (e.g., `@/components/ui/dialog`, `@/components/ui/button`) for the popup UI. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Ensure the print-only ResumePrintView is always rendered with the current in-memory draft used for the on-screen preview (including unsaved edits), and keep screen-only UI hidden via existing `print:hidden` patterns so printing picks the correct content."
-        },
-        {
-          "path": "frontend/src/utils/pdfExport.ts",
-          "operation": "modify",
-          "description": "Add defensive checks/error surfacing around invoking browser print (e.g., validate required resume fields/title, handle runtime errors) to avoid silent failures and support REQ-4 error messaging integration."
+          "description": "Wire `AndroidInstallPopup` into the global app layout so it can appear automatically on relevant pages without user interaction, while keeping the existing header install control unchanged."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Make Resume Editor draft initialization/reset reliable when switching between resumes and prevent the editor from getting stuck with null/blank draft state after data is fetched.",
+      "summary": "Add dismissal and cooldown controls for the Android install popup, persisted in localStorage and cleared on install.",
       "acceptanceCriteria": [
-        "Opening Resume A, then navigating to Resume B loads and edits Resume B (draft is reset/reinitialized appropriately) and does not keep Resume A content.",
-        "The editor does not render a blank/null state indefinitely once the resume query has returned data.",
-        "After saving, the UI correctly reflects “All changes saved” and subsequent edits re-enable the save state as expected."
+        "The popup includes a \"Not now\" (or equivalent) dismiss action.",
+        "After dismissing, the popup does not reappear on the next page load for a reasonable cooldown period (persisted in localStorage).",
+        "If the user later installs the app, any stored dismissal state no longer causes the popup to appear."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ResumeEditor.tsx",
-          "operation": "modify",
-          "description": "Refactor draft lifecycle: reinitialize draft (and reset `hasChanges`) whenever the loaded resume ID/content changes; avoid conditioning initialization on `!draft` so navigation between resume IDs cannot keep stale draft. Replace the `if (!draft) return null;` branch with a non-stuck fallback (loader or error UI) once the resume query is fetched."
+          "path": "frontend/src/hooks/useAndroidInstallPopupCooldown.ts",
+          "operation": "create",
+          "description": "Create a small hook/utility to manage install-popup dismissal state in localStorage (e.g., store last-dismissed time and compute whether cooldown has expired), and provide helpers to dismiss and to clear state when the app becomes installed."
         },
         {
-          "path": "frontend/src/hooks/useResumes.ts",
+          "path": "frontend/src/components/pwa/AndroidInstallPopup.tsx",
           "operation": "modify",
-          "description": "Adjust resume fetching/caching behavior as needed to prevent brief stale resume data when navigating between IDs (e.g., ensure the query key and query behavior return the correct resume and do not preserve previous resume content unexpectedly)."
+          "description": "Add a \"Not now\" action that records dismissal via the cooldown hook, prevents reopening until the cooldown expires, and clears any stored dismissal state when installation succeeds (based on `promptInstall()` result and/or `isInstalled` becoming true). Use existing shadcn Button styling for actions. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Fix offline-first sync queue processing so failed operations remain queued and only successful operations are removed; update last-sync time only on full success.",
+      "summary": "Restrict the install popup to Android devices/browsers only, preventing rendering on iOS and desktop while leaving existing install controls intact.",
       "acceptanceCriteria": [
-        "If syncing pending changes and a backend operation fails, the failed operation(s) remain in the local sync queue for retry (they are not discarded).",
-        "If syncing pending changes and operations succeed, those successful operation(s) are removed from the queue and the UI reflects reduced pending changes accordingly.",
-        "A full successful sync run clears the queue and updates the stored last-sync time."
+        "The popup does not render on iOS Safari (or other iOS browsers), even if the app is not installed.",
+        "The popup does not render on desktop browsers.",
+        "The existing header install control and existing install instructions dialog remain available and functional for all platforms as they are today."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/storage/resumeSyncQueue.ts",
-          "operation": "modify",
-          "description": "Extend sync-queue utilities to support partial removal (remove only successfully processed operations) and to update last-sync time only when the queue is fully cleared due to success. Add a lightweight change-notification mechanism (e.g., dispatch a window event) so UI can react to queue updates."
+          "path": "frontend/src/utils/platform.ts",
+          "operation": "create",
+          "description": "Add lightweight platform detection helpers to identify Android vs iOS vs desktop (e.g., UA checks plus a coarse-pointer/mobile heuristic) for gating the Android install popup without affecting other install UI."
         },
         {
-          "path": "frontend/src/hooks/useResumes.ts",
+          "path": "frontend/src/components/pwa/AndroidInstallPopup.tsx",
           "operation": "modify",
-          "description": "Update `useSyncPendingChanges` to process the queue while retaining failed operations, removing only successful ones, and only calling last-sync update when all operations succeed. Ensure the mutation reports partial-failure state without discarding queued changes."
-        },
-        {
-          "path": "frontend/src/components/SyncStatusBadge.tsx",
-          "operation": "modify",
-          "description": "Make the badge reactive to sync queue/last-sync changes (e.g., listen for the sync-queue change event or use state polling) so pending count and last sync time update immediately after successful/partial sync runs."
-        },
-        {
-          "path": "frontend/src/components/AppLayout.tsx",
-          "operation": "modify",
-          "description": "Ensure the automatic sync trigger on reconnect continues to run safely with the updated partial-success behavior (e.g., do not suppress retries when prior run had failures; avoid getting stuck in a non-processing state)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Add clear, user-facing English error messages for save, sync, and PDF export/print failures while keeping the app usable.",
-      "acceptanceCriteria": [
-        "When saving a resume fails, the user sees an actionable English error message (not just a console error).",
-        "When sync processing encounters errors, the user is informed that some changes are still pending and will be retried (without losing data).",
-        "When initiating PDF export/print fails (e.g., due to missing draft), the user sees an English error message and the app remains usable."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ResumeEditor.tsx",
-          "operation": "modify",
-          "description": "Improve error handling UX: show clear English messages when save fails and when PDF export cannot start (e.g., missing draft), using existing toast/alert patterns; ensure errors do not leave the page in a broken state."
-        },
-        {
-          "path": "frontend/src/hooks/useResumes.ts",
-          "operation": "modify",
-          "description": "Improve sync/save error propagation: when sync processing has partial failures, surface a user-facing message indicating some changes are still pending and will retry; ensure save failures throw actionable messages already extracted via `extractErrorMessage`."
-        },
-        {
-          "path": "frontend/src/components/AppLayout.tsx",
-          "operation": "modify",
-          "description": "Handle sync mutation errors with a user-facing message (e.g., toast) indicating retry behavior; ensure the rest of the UI remains usable and that repeated reconnects can re-attempt syncing."
-        },
-        {
-          "path": "frontend/src/utils/errorMessage.ts",
-          "operation": "modify",
-          "description": "Refine user-friendly message extraction/mapping for common sync/save/print failure cases so UI can consistently display clear English messages (without relying on console-only errors)."
+          "description": "Gate popup rendering to Android only using the new platform helper(s), and ensure it returns null on iOS and on desktop-class browsers even if installability conditions are met; do not alter `PwaInstallControl` or `PwaInstallInstructionsDialog` behavior. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -1,90 +1,70 @@
 {
   "kind": "build_request",
-  "title": "Fix PDF export missing resume content and repair draft/sync processing",
-  "priority": "high",
+  "title": "Add Android PWA install popup",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
+      "text": "Add an in-app install popup that is shown to Android users when the PWA is installable (native beforeinstallprompt is available) and the app is not already installed, offering a direct \"Install\" action that triggers the browser install prompt.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-10"
         ],
         "quotes": [
-          "Still the pdf doesn't holds the created resume content."
+          "Add Android install popup"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking “Download PDF” from the Resume Editor prints/exports a PDF that matches the on-screen preview content for the current draft (including any unsaved edits if the user chooses not to save).",
-        "The print stylesheet no longer hides the entire app root (e.g., #root) such that `.print-only` content is excluded from printing.",
-        "On screen (non-print), the print-only resume view is not visibly rendered (no duplicate resume displayed)."
+        "On Android (Chrome/Chromium), when `usePwaInstall().canInstall` is true and `isInstalled` is false, a popup is displayed to the user without requiring them to click the existing header install control.",
+        "The popup has an \"Install\" button that calls the existing `promptInstall()` flow and, after successful install, the popup is no longer shown.",
+        "If the app is already installed (`display-mode: standalone` or equivalent), the popup never shows."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
+      "text": "Implement dismissal and frequency controls for the Android install popup so users are not repeatedly interrupted.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-10"
         ],
         "quotes": [
-          "Also the draft is not processing here fix all the errors and problems"
+          "Add Android install popup"
         ]
       },
       "acceptanceCriteria": [
-        "Opening Resume A, then navigating to Resume B loads and edits Resume B (draft is reset/reinitialized appropriately) and does not keep Resume A content.",
-        "The editor does not render a blank/null state indefinitely once the resume query has returned data.",
-        "After saving, the UI correctly reflects “All changes saved” and subsequent edits re-enable the save state as expected."
+        "The popup includes a \"Not now\" (or equivalent) dismiss action.",
+        "After dismissing, the popup does not reappear on the next page load for a reasonable cooldown period (persisted in localStorage).",
+        "If the user later installs the app, any stored dismissal state no longer causes the popup to appear."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "text": "Limit the Android install popup to Android devices/browsers and ensure it does not appear on iOS or desktop.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-10"
         ],
         "quotes": [
-          "Also the draft is not processing here fix all the errors and problems"
+          "Add Android install popup"
         ]
       },
       "acceptanceCriteria": [
-        "If syncing pending changes and a backend operation fails, the failed operation(s) remain in the local sync queue for retry (they are not discarded).",
-        "If syncing pending changes and operations succeed, those successful operation(s) are removed from the queue and the UI reflects reduced pending changes accordingly.",
-        "A full successful sync run clears the queue and updates the stored last-sync time."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "fix all the errors and problems"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When saving a resume fails, the user sees an actionable English error message (not just a console error).",
-        "When sync processing encounters errors, the user is informed that some changes are still pending and will be retried (without losing data).",
-        "When initiating PDF export/print fails (e.g., due to missing draft), the user sees an English error message and the app remains usable."
+        "The popup does not render on iOS Safari (or other iOS browsers), even if the app is not installed.",
+        "The popup does not render on desktop browsers.",
+        "The existing header install control and existing install instructions dialog remain available and functional for all platforms as they are today."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/components/ui (compose them instead).",
-    "Do not modify any files listed under frontend.immutablePaths in SYSTEM_CONTEXT.",
-    "Keep all backend logic in the single Motoko actor (backend/main.mo); only add a migration file if a state schema upgrade is required."
+    "Do not edit files under frontend/src/components/ui (Shadcn UI sources are read-only).",
+    "Do not edit immutable paths listed in SYSTEM_CONTEXT (compose new components/hooks instead)."
   ],
   "nonGoals": [
-    "Adding a new PDF generation library or server-side PDF rendering.",
-    "Introducing external databases, third-party auth providers, WebSockets, or any non-ICP backend services.",
-    "Redesigning resume templates or adding new resume sections unrelated to fixing print/PDF and draft/sync reliability."
+    "Changing the PWA manifest, service worker caching strategy, or icon assets.",
+    "Adding backend support or persisting install-popup state in the canister."
   ],
   "imageRequirements": {
     "required": [],
