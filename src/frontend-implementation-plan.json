@@ -1,0 +1,50 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Implement functional offline-first Resume Editor with save flow",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Replace ResumeEditor placeholder with an editable form for resume title, personal info, and summary, including explicit save behavior and preserving the existing not-found UI.",
+      "acceptanceCriteria": [
+        "Opening `/editor/$resumeId` no longer shows the “coming soon” placeholder text.",
+        "The page renders editable form controls bound to the loaded resume data (at minimum: resume title, personal info, summary).",
+        "Edits can be saved back to local storage via the existing resume update flow (no data loss after refresh).",
+        "If the resume ID does not exist, the existing “Resume not found” state still renders."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "operation": "modify",
+          "description": "Replace the placeholder UI with a functional editor view: load resume via useGetResume(resumeId), initialize local draft state from the loaded resume, render form controls for title, personal info (e.g., fullName/email/phone/location/linkedin/website), and summary, and add Save/Cancel (or Save) actions that call the existing update flow. Keep the existing loading and “Resume not found” states intact."
+        },
+        {
+          "path": "frontend/src/components/ResumeEditorForm.tsx",
+          "operation": "create",
+          "description": "Create a reusable ResumeEditorForm component that renders the resume edit fields and emits updated draft values. Compose existing shadcn-ui components (e.g., Card, Button, Input, Label, Textarea) rather than editing anything under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Wire the resume editor to the existing offline-first persistence + sync logic using useGetResume for loading and useUpdateResume for saving, ensuring immediate local updates and backend sync when authenticated + online.",
+      "acceptanceCriteria": [
+        "After editing and saving, the Resumes Dashboard reflects the updated resume content (e.g., updated title/summary and updated timestamp where applicable) without requiring a hard reload.",
+        "When offline (or unauthenticated), saving still works locally.",
+        "When authenticated and online, saving triggers backend update via the existing sync path (no new backend endpoints required)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useResumes.ts",
+          "operation": "modify",
+          "description": "Enhance useUpdateResume to more clearly support editor-driven updates without requiring hard reloads by ensuring react-query caches are updated/invalidation happens appropriately after a save (e.g., keep invalidations and optionally add immediate cache updates for ['resume', id] and ['allResumes']). This must continue to use the existing offline-first local save + queued sync behavior, and must not require any new backend capability."
+        },
+        {
+          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "operation": "modify",
+          "description": "Connect the editor Save action to useUpdateResume (mutate/mutateAsync) so that saving always persists locally immediately and triggers the existing sync path when authenticated + online. Ensure the editor uses the loaded resume as the source of truth on initial load, and updates the UI state after successful save so that returning to the dashboard reflects changes without a hard reload."
+        }
+      ]
+    }
+  ]
+}

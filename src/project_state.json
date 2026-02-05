@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "Internet Computer (Motoko + React) resume builder app with Internet Identity authentication, user profiles, offline-first resume editing, and backend storage/sync (including blob storage for assets).",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Internet Identity authentication & session handling",
+      "synonyms": [
+        "II login",
+        "Auth controls"
+      ],
+      "description": "Frontend integrates Internet Identity login/logout and actor creation; backend authorization layer enforces access control.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "User profile setup and current-user profile retrieval",
+      "synonyms": [
+        "Profile setup dialog",
+        "User profile"
+      ],
+      "description": "UI flow to create/update a user profile and hooks to fetch the current user's profile data.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "Resumes dashboard (list/create/open)",
+      "synonyms": [
+        "Resumes list",
+        "Dashboard"
+      ],
+      "description": "Dedicated dashboard page for managing resumes, including loading existing resumes and initiating resume creation/editing.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Resume editor page",
+      "synonyms": [
+        "Editor"
+      ],
+      "description": "Resume editing UI page with supporting types and hooks for resume data manipulation.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Offline-first local resume storage with sync queue and status indicator",
+      "synonyms": [
+        "Local store",
+        "Sync status badge",
+        "Offline sync"
+      ],
+      "description": "Local persistence for resumes and a sync queue for reconciling changes when online, with UI status indicator and online-status detection.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Backend storage modules (core storage + blob storage)",
+      "synonyms": [
+        "Storage canister",
+        "Blob storage"
+      ],
+      "description": "Motoko backend includes storage primitives and blob storage modules for persisting data/assets, integrated into main canister.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Privacy Policy page",
+      "synonyms": [
+        "Privacy policy"
+      ],
+      "description": "Static Privacy Policy route/page included in the frontend.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Build/deploy template for ICP project (frontend + backend)",
+      "synonyms": [
+        "Build template",
+        "Docker/build scripts"
+      ],
+      "description": "Template includes Dockerfile, deploy scripts, canister configs, workspace/package management, and frontend scaffolding (shadcn-ui).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-placeholder-content-in-frontend-src-pages-resumeeditor-tsx-currently-showing-resume-editor-coming-soon-with-a-functional-resume-editor-ui-that-allows-editing-and-saving-resume-data",
+      "title": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-resume-editor-ui-to-the-existing-offline-first-persistence-and-sync-logic-by-using-the-existing-hooks-in-frontend-src-hooks-useresumes-ts-e-g-usegetresume-for-loading-and-useupdateresume-for-saving-so-that-edits-update-the-local-resume-immediately-and-sync-to-the-backend-when-authenticated-online",
+      "title": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [],
+  "architectural_notes": [
+    "Frontend: React + Vite + Tailwind with shadcn-ui component library scaffolded in build-template.",
+    "Authentication: Internet Identity used on frontend; backend uses authorization/access-control modules (mixin-based) to gate methods.",
+    "Offline-first approach: resumes stored locally and synced via a queue when connectivity returns; UI shows sync status.",
+    "Backend: Motoko canister composes core storage and blob storage modules; main canister wires modules together.",
+    "Authorization layer updated to component:authorization:v4.0.0 (mixin-based access control refinements).",
+    "Blob storage module updated to component:blob-storage:v4.0.0 and re-wired through backend main canister.",
+    "Build template standardized as component:build-template-react:v1.0.0 with expanded shadcn-ui component set and custom ESLint rules for ICP/II constraints.",
+    "Build/deploy tooling refreshed (Dockerfile, icp.yaml, deploy.sh, image resize/prune scripts) under core infrastructure component:core-infrastructure:v1.0.2."
+  ],
+  "known_issues": [
+    "Resume creation flow shows placeholder message ('Resume editor coming soon...') instead of opening the actual resume editor."
+  ],
+  "isFixRequest": true,
+  "generatedImages": [
+    {
+      "filename": "frontend/public/assets/generated/hero.dim_1600x900.png",
+      "description": "Generated hero image asset",
+      "targetWidth": 1600,
+      "targetHeight": 900
+    },
+    {
+      "filename": "frontend/public/assets/generated/logo.dim_512x512.png",
+      "description": "Generated logo asset",
+      "targetWidth": 512,
+      "targetHeight": 512
+    },
+    {
+      "filename": "frontend/public/assets/generated/template-ats-thumb.dim_600x800.png",
+      "description": "Generated template thumbnail (ATS)",
+      "targetWidth": 600,
+      "targetHeight": 800
+    },
+    {
+      "filename": "frontend/public/assets/generated/template-creative-thumb.dim_600x800.png",
+      "description": "Generated template thumbnail (Creative)",
+      "targetWidth": 600,
+      "targetHeight": 800
+    },
+    {
+      "filename": "frontend/public/assets/generated/template-minimal-thumb.dim_600x800.png",
+      "description": "Generated template thumbnail (Minimal)",
+      "targetWidth": 600,
+      "targetHeight": 800
+    },
+    {
+      "filename": "frontend/public/assets/generated/template-modern-thumb.dim_600x800.png",
+      "description": "Generated template thumbnail (Modern)",
+      "targetWidth": 600,
+      "targetHeight": 800
+    },
+    {
+      "filename": "frontend/public/assets/generated/template-professional-thumb.dim_600x800.png",
+      "description": "Generated template thumbnail (Professional)",
+      "targetWidth": 600,
+      "targetHeight": 800
+    }
+  ],
+  "projectName": "Replace Resume Editor placeholder with functional resume editing and saving",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

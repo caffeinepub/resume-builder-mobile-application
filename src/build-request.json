@@ -1,0 +1,58 @@
+{
+  "kind": "build_request",
+  "title": "Replace Resume Editor placeholder with functional resume editing and saving",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "When i create a resume the app shows like this, \"Resume editor coming soon. Full editing capabilities will be available in the next update.\""
+        ]
+      },
+      "acceptanceCriteria": [
+        "Opening `/editor/$resumeId` no longer shows the “coming soon” placeholder text.",
+        "The page renders editable form controls bound to the loaded resume data (at minimum: resume title, personal info, summary).",
+        "Edits can be saved back to local storage via the existing resume update flow (no data loss after refresh).",
+        "If the resume ID does not exist, the existing “Resume not found” state still renders."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "When i create a resume the app shows like this, \"Resume editor coming soon. Full editing capabilities will be available in the next update.\""
+        ]
+      },
+      "acceptanceCriteria": [
+        "After editing and saving, the Resumes Dashboard reflects the updated resume content (e.g., updated title/summary and updated timestamp where applicable) without requiring a hard reload.",
+        "When offline (or unauthenticated), saving still works locally.",
+        "When authenticated and online, saving triggers backend update via the existing sync path (no new backend endpoints required)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under `frontend/src/components/ui` (compose existing shadcn components instead).",
+    "Do not modify `frontend/src/hooks/useInternetIdentity.ts` / `.tsx`, `frontend/src/hooks/useActor.ts`, or `frontend/src/main.tsx` (immutable paths).",
+    "Keep backend as a single Motoko actor; do not introduce additional backend services."
+  ],
+  "nonGoals": [
+    "PDF export or print layouts.",
+    "Adding third-party authentication providers (only Internet Identity is supported).",
+    "Real-time collaboration or WebSocket-based editing."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

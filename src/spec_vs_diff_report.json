@@ -1,0 +1,38 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-05T12:00:30.105Z",
+  "summary": "REQ-1 and REQ-2 appear to be implemented: the ResumeEditor placeholder is replaced with an editable form (title, personal info, summary) and save/cancel actions, and the page uses useGetResume/useUpdateResume from useResumes for offline-first persistence and sync. Some additional behavior changes in useResumes (e.g., resume list merging logic and query staleness tweaks) and toast notifications were introduced beyond the explicit request.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "Added toast-based success/error notifications on save in the Resume Editor UI.",
+      "reason": "BuildRequest does not ask for toast notifications; it only requires editing and saving functionality.",
+      "evidence": [
+        "frontend/src/pages/ResumeEditor.tsx"
+      ]
+    },
+    {
+      "description": "Changed resume list loading/merging behavior to build a backend resume map, merge backend resumes, and append only local-only resumes (id starts with 'local_') when authenticated.",
+      "reason": "BuildRequest focuses on the Resume Editor wiring; it does not request changes to dashboard list merge semantics.",
+      "evidence": [
+        "frontend/src/hooks/useResumes.ts"
+      ]
+    },
+    {
+      "description": "Adjusted resume query freshness behavior by explicitly setting staleTime: 0 for useGetResume to avoid briefly showing stale data.",
+      "reason": "Not explicitly requested in REQ-1/REQ-2; it is an additional query-behavior change.",
+      "evidence": [
+        "frontend/src/hooks/useResumes.ts"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/ResumeEditorForm.tsx",
+    "frontend/src/hooks/useResumes.ts",
+    "frontend/src/pages/ResumeEditor.tsx",
+    "project_state.json"
+  ]
+}

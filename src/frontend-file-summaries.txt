@@ -1,0 +1,23 @@
+{
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup, theme provider, and route definitions for dashboard, editor, and privacy pages.",
+  "frontend/src/types/resume.ts": "Complete TypeScript type definitions for resume data structure including personal info, education, experience, skills, projects, certifications, languages, achievements, hobbies, and formatting options.",
+  "frontend/src/storage/resumeLocalStore.ts": "Local browser storage implementation with in-memory fallback for when localStorage is unavailable, ensuring resume operations always succeed even in private browsing mode or when storage quota is exceeded.",
+  "frontend/src/storage/resumeSyncQueue.ts": "Sync queue management for offline-first functionality, tracking pending operations and last sync timestamps.",
+  "frontend/src/hooks/useOnlineStatus.ts": "React hook that monitors browser online/offline status using native navigator events.",
+  "frontend/src/hooks/useCurrentUserProfile.ts": "React Query hook for fetching caller user profile with proper loading state management to prevent modal flash.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including user profile management and resume CRUD operations.",
+  "frontend/src/hooks/useResumes.ts": "Unified resume management hooks with robust error handling, storage fallback support, and improved backend sync; useUpdateResume now immediately updates query cache for instant UI refresh after save.",
+  "frontend/src/components/AppLayout.tsx": "Root layout component with header, footer, outlet for child routes, profile setup dialog, and automatic sync trigger.",
+  "frontend/src/components/AppHeader.tsx": "Application header with logo, navigation, sync status badge, and authentication controls.",
+  "frontend/src/components/AppFooter.tsx": "Footer component with copyright attribution and privacy policy link.",
+  "frontend/src/components/AuthControls.tsx": "Authentication UI component for Internet Identity login/logout with user profile display.",
+  "frontend/src/components/ProfileSetupDialog.tsx": "Modal dialog for first-time user name capture after Internet Identity login.",
+  "frontend/src/components/SyncStatusBadge.tsx": "Status indicator showing online/offline state, last sync time, and pending changes count for authenticated users.",
+  "frontend/src/pages/ResumesDashboard.tsx": "Main dashboard page with improved error handling showing specific, actionable error messages for all operations; includes storage availability warnings and proper dialog state management.",
+  "frontend/src/pages/PrivacyPolicy.tsx": "Comprehensive privacy policy page explaining data storage, permissions, and user rights.",
+  "frontend/src/pages/ResumeEditor.tsx": "Resume editor page with functional form for editing resume title, personal info, and summary; includes save/cancel actions, loading states, not-found handling, and tracks unsaved changes.",
+  "frontend/src/index.css": "Global styles with OKLCH-based emerald/forest green color theme for light and dark modes.",
+  "frontend/tailwind.config.js": "Tailwind configuration with custom emerald theme colors, Inter font family, and extended design tokens.",
+  "frontend/src/utils/errorMessage.ts": "Utility functions for extracting user-friendly error messages from various error types, detecting storage-related errors, and providing actionable recovery guidance.",
+  "frontend/src/components/ResumeEditorForm.tsx": "Reusable form component for editing resume fields including title, personal information (name, email, phone, location, LinkedIn, website), and professional summary using shadcn/ui components."
+}

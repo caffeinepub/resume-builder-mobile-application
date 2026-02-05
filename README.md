@@ -1,2 +1,3 @@
-# resume-builder-mobile-application
-Exported from Caffeine project: Replace Resume Editor placeholder with functional resume editing and saving
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

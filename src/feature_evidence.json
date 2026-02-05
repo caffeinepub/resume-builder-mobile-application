@@ -1,0 +1,47 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-replace-the-placeholder-content-in-frontend-src-pages-resumeeditor-tsx-currently-showing-resume-editor-coming-soon-with-a-functional-resume-editor-ui-that-allows-editing-and-saving-resume-data",
+      "featureTitle": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "files": [
+        "frontend/src/components/ResumeEditorForm.tsx",
+        "frontend/src/pages/ResumeEditor.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-the-resume-editor-ui-to-the-existing-offline-first-persistence-and-sync-logic-by-using-the-existing-hooks-in-frontend-src-hooks-useresumes-ts-e-g-usegetresume-for-loading-and-useupdateresume-for-saving-so-that-edits-update-the-local-resume-immediately-and-sync-to-the-backend-when-authenticated-online",
+      "featureTitle": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "files": [
+        "frontend/src/hooks/useResumes.ts",
+        "frontend/src/pages/ResumeEditor.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
