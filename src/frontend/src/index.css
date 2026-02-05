@@ -93,3 +93,71 @@
     text-wrap: balance;
   }
 }
+
+/* Resume Template Font Classes */
+.font-inter { font-family: 'Inter', sans-serif; }
+.font-roboto { font-family: 'Roboto', sans-serif; }
+.font-lora { font-family: 'Lora', serif; }
+.font-playfair { font-family: 'Playfair Display', serif; }
+.font-source-sans { font-family: 'Source Sans Pro', sans-serif; }
+
+/* Resume Template Color Theme Classes */
+.theme-emerald { color: oklch(0.15 0.02 160); }
+.theme-emerald h1, .theme-emerald h2, .theme-emerald h3 { color: oklch(0.52 0.14 165); }
+.theme-emerald .border-current { border-color: oklch(0.52 0.14 165); }
+
+.theme-slate { color: oklch(0.20 0.02 240); }
+.theme-slate h1, .theme-slate h2, .theme-slate h3 { color: oklch(0.45 0.02 240); }
+.theme-slate .border-current { border-color: oklch(0.45 0.02 240); }
+
+.theme-amber { color: oklch(0.20 0.02 60); }
+.theme-amber h1, .theme-amber h2, .theme-amber h3 { color: oklch(0.65 0.18 75); }
+.theme-amber .border-current { border-color: oklch(0.65 0.18 75); }
+
+.theme-rose { color: oklch(0.20 0.02 15); }
+.theme-rose h1, .theme-rose h2, .theme-rose h3 { color: oklch(0.60 0.20 15); }
+.theme-rose .border-current { border-color: oklch(0.60 0.20 15); }
+
+.theme-blue { color: oklch(0.20 0.02 240); }
+.theme-blue h1, .theme-blue h2, .theme-blue h3 { color: oklch(0.55 0.18 240); }
+.theme-blue .border-current { border-color: oklch(0.55 0.18 240); }
+
+/* Hide print-only content on screen */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide all screen-only content */
+  .print\\:hidden {
+    display: none !important;
+  }
+  
+  /* Show only print content */
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Reset print margins */
+  @page {
+    margin: 0.5in;
+    size: letter;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Ensure proper page breaks */
+  .resume-template {
+    page-break-after: auto;
+  }
+  
+  .resume-template section {
+    page-break-inside: avoid;
+  }
+}

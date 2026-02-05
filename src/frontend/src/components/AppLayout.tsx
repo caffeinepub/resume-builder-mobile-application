@@ -6,6 +6,7 @@ import ProfileSetupDialog from './ProfileSetupDialog';
 import { useSyncPendingChanges } from '../hooks/useResumes';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { toast } from 'sonner';
 
 export default function AppLayout() {
   const isOnline = useOnlineStatus();
@@ -14,7 +15,22 @@ export default function AppLayout() {
 
   useEffect(() => {
     if (isOnline && identity && !syncPending.isPending) {
-      syncPending.mutate();
+      syncPending.mutate(undefined, {
+        onSuccess: (result) => {
+          if (result && result.success > 0) {
+            toast.success(`Synced ${result.success} pending change${result.success > 1 ? 's' : ''}`);
+          }
+        },
+        onError: (error) => {
+          // Error message already includes details about partial success
+          const message = error instanceof Error ? error.message : 'Sync failed';
+          if (message.includes('partially completed')) {
+            toast.warning(message);
+          } else {
+            toast.error('Failed to sync changes. Will retry when online.');
+          }
+        },
+      });
     }
   }, [isOnline, identity]);
 

@@ -1,58 +1,103 @@
 {
   "kind": "build_request",
-  "title": "Replace Resume Editor placeholder with functional resume editing and saving",
+  "title": "Fix PDF export missing resume content and repair draft/sync processing",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "text": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-3"
         ],
         "quotes": [
-          "When i create a resume the app shows like this, \"Resume editor coming soon. Full editing capabilities will be available in the next update.\""
+          "Still the pdf doesn't holds the created resume content."
         ]
       },
       "acceptanceCriteria": [
-        "Opening `/editor/$resumeId` no longer shows the “coming soon” placeholder text.",
-        "The page renders editable form controls bound to the loaded resume data (at minimum: resume title, personal info, summary).",
-        "Edits can be saved back to local storage via the existing resume update flow (no data loss after refresh).",
-        "If the resume ID does not exist, the existing “Resume not found” state still renders."
+        "Clicking “Download PDF” from the Resume Editor prints/exports a PDF that matches the on-screen preview content for the current draft (including any unsaved edits if the user chooses not to save).",
+        "The print stylesheet no longer hides the entire app root (e.g., #root) such that `.print-only` content is excluded from printing.",
+        "On screen (non-print), the print-only resume view is not visibly rendered (no duplicate resume displayed)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "text": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-3"
         ],
         "quotes": [
-          "When i create a resume the app shows like this, \"Resume editor coming soon. Full editing capabilities will be available in the next update.\""
+          "Also the draft is not processing here fix all the errors and problems"
         ]
       },
       "acceptanceCriteria": [
-        "After editing and saving, the Resumes Dashboard reflects the updated resume content (e.g., updated title/summary and updated timestamp where applicable) without requiring a hard reload.",
-        "When offline (or unauthenticated), saving still works locally.",
-        "When authenticated and online, saving triggers backend update via the existing sync path (no new backend endpoints required)."
+        "Opening Resume A, then navigating to Resume B loads and edits Resume B (draft is reset/reinitialized appropriately) and does not keep Resume A content.",
+        "The editor does not render a blank/null state indefinitely once the resume query has returned data.",
+        "After saving, the UI correctly reflects “All changes saved” and subsequent edits re-enable the save state as expected."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Also the draft is not processing here fix all the errors and problems"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If syncing pending changes and a backend operation fails, the failed operation(s) remain in the local sync queue for retry (they are not discarded).",
+        "If syncing pending changes and operations succeed, those successful operation(s) are removed from the queue and the UI reflects reduced pending changes accordingly.",
+        "A full successful sync run clears the queue and updates the stored last-sync time."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "fix all the errors and problems"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When saving a resume fails, the user sees an actionable English error message (not just a console error).",
+        "When sync processing encounters errors, the user is informed that some changes are still pending and will be retried (without losing data).",
+        "When initiating PDF export/print fails (e.g., due to missing draft), the user sees an English error message and the app remains usable."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under `frontend/src/components/ui` (compose existing shadcn components instead).",
-    "Do not modify `frontend/src/hooks/useInternetIdentity.ts` / `.tsx`, `frontend/src/hooks/useActor.ts`, or `frontend/src/main.tsx` (immutable paths).",
-    "Keep backend as a single Motoko actor; do not introduce additional backend services."
+    "Do not modify files under frontend/src/components/ui (compose them instead).",
+    "Do not modify any files listed under frontend.immutablePaths in SYSTEM_CONTEXT.",
+    "Keep all backend logic in the single Motoko actor (backend/main.mo); only add a migration file if a state schema upgrade is required."
   ],
   "nonGoals": [
-    "PDF export or print layouts.",
-    "Adding third-party authentication providers (only Internet Identity is supported).",
-    "Real-time collaboration or WebSocket-based editing."
+    "Adding a new PDF generation library or server-side PDF rendering.",
+    "Introducing external databases, third-party auth providers, WebSockets, or any non-ICP backend services.",
+    "Redesigning resume templates or adding new resume sections unrelated to fixing print/PDF and draft/sync reliability."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

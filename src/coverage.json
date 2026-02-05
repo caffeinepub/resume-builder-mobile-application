@@ -1,39 +1,75 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-05T12:00:30.139Z",
+  "generatedAt": "2026-02-05T13:01:19.642Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+        "summary": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/index.css",
           "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/components/ResumeEditorForm.tsx"
+          "frontend/src/utils/pdfExport.ts"
         ],
         "matchedFiles": [
+          "frontend/src/index.css",
           "frontend/src/pages/ResumeEditor.tsx",
-          "frontend/src/components/ResumeEditorForm.tsx"
+          "frontend/src/utils/pdfExport.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+        "summary": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useResumes.ts",
-          "frontend/src/pages/ResumeEditor.tsx"
+          "frontend/src/pages/ResumeEditor.tsx",
+          "frontend/src/hooks/useResumes.ts"
         ],
         "matchedFiles": [
+          "frontend/src/pages/ResumeEditor.tsx",
+          "frontend/src/hooks/useResumes.ts"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/storage/resumeSyncQueue.ts",
           "frontend/src/hooks/useResumes.ts",
-          "frontend/src/pages/ResumeEditor.tsx"
+          "frontend/src/components/SyncStatusBadge.tsx",
+          "frontend/src/components/AppLayout.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/storage/resumeSyncQueue.ts",
+          "frontend/src/hooks/useResumes.ts",
+          "frontend/src/components/SyncStatusBadge.tsx",
+          "frontend/src/components/AppLayout.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ResumeEditor.tsx",
+          "frontend/src/hooks/useResumes.ts",
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/utils/errorMessage.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ResumeEditor.tsx",
+          "frontend/src/hooks/useResumes.ts",
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/utils/errorMessage.ts"
         ]
       }
     ]
@@ -43,9 +79,14 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/ResumeEditorForm.tsx",
+    "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/SyncStatusBadge.tsx",
     "frontend/src/hooks/useResumes.ts",
+    "frontend/src/index.css",
     "frontend/src/pages/ResumeEditor.tsx",
+    "frontend/src/storage/resumeSyncQueue.ts",
+    "frontend/src/utils/errorMessage.ts",
+    "frontend/src/utils/pdfExport.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

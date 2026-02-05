@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 23,
   "summary": "Internet Computer (Motoko + React) resume builder app with Internet Identity authentication, user profiles, offline-first resume editing, and backend storage/sync (including blob storage for assets).",
   "existing_features": [
     {
@@ -91,18 +91,47 @@
       "version": 1
     },
     {
-      "id": "feature-replace-the-placeholder-content-in-frontend-src-pages-resumeeditor-tsx-currently-showing-resume-editor-coming-soon-with-a-functional-resume-editor-ui-that-allows-editing-and-saving-resume-data",
-      "title": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "id": "IF-9",
+      "title": "Resume preview, templates, formatting controls, and print/PDF export",
+      "synonyms": [
+        "Resume preview",
+        "Resume templates",
+        "Print view",
+        "PDF export"
+      ],
+      "description": "Adds a resume preview/rendering pipeline with selectable templates, a formatting panel, a dedicated print view, and client-side PDF/print export utilities.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-print-pdf-export-so-the-generated-pdf-contains-the-currently-edited-resume-content-by-ensuring-the-print-view-is-actually-visible-to-the-browser-during-printing-do-not-hide-the-entire-react-root-container-during-media-print",
+      "title": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-wire-the-resume-editor-ui-to-the-existing-offline-first-persistence-and-sync-logic-by-using-the-existing-hooks-in-frontend-src-hooks-useresumes-ts-e-g-usegetresume-for-loading-and-useupdateresume-for-saving-so-that-edits-update-the-local-resume-immediately-and-sync-to-the-backend-when-authenticated-online",
-      "title": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "id": "feature-fix-draft-handling-in-the-resume-editor-so-the-correct-draft-is-initialized-and-updated-reliably-when-the-loaded-resume-changes-e-g-navigating-between-different-resume-ids-and-ensure-draft-state-cannot-get-stuck-in-a-non-processing-state",
+      "title": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-offline-first-draft-syncing-so-queued-draft-resume-operations-are-not-lost-do-not-clear-the-entire-sync-queue-when-one-or-more-operations-fail-and-ensure-only-successfully-processed-operations-are-removed-from-the-queue",
+      "title": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-user-facing-error-handling-for-pdf-export-and-draft-sync-processing-failures-by-displaying-clear-english-error-messages-in-the-ui-when-operations-fail-save-sync-retry-or-print-export",
+      "title": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -116,10 +145,12 @@
     "Authorization layer updated to component:authorization:v4.0.0 (mixin-based access control refinements).",
     "Blob storage module updated to component:blob-storage:v4.0.0 and re-wired through backend main canister.",
     "Build template standardized as component:build-template-react:v1.0.0 with expanded shadcn-ui component set and custom ESLint rules for ICP/II constraints.",
-    "Build/deploy tooling refreshed (Dockerfile, icp.yaml, deploy.sh, image resize/prune scripts) under core infrastructure component:core-infrastructure:v1.0.2."
+    "Build/deploy tooling refreshed (Dockerfile, icp.yaml, deploy.sh, image resize/prune scripts) under core infrastructure component:core-infrastructure:v1.0.2.",
+    "Resume rendering includes template-based preview + dedicated print view with client-side PDF/print export utility."
   ],
   "known_issues": [
-    "Resume creation flow shows placeholder message ('Resume editor coming soon...') instead of opening the actual resume editor."
+    "PDF export/print view does not include the created resume content (generated PDF is missing edited data).",
+    "Draft processing is failing (draft not processing as expected)."
   ],
   "isFixRequest": true,
   "generatedImages": [
@@ -166,7 +197,7 @@
       "targetHeight": 800
     }
   ],
-  "projectName": "Replace Resume Editor placeholder with functional resume editing and saving",
+  "projectName": "Fix PDF export missing resume content and repair draft/sync processing",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

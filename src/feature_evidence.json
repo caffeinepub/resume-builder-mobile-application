@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-replace-the-placeholder-content-in-frontend-src-pages-resumeeditor-tsx-currently-showing-resume-editor-coming-soon-with-a-functional-resume-editor-ui-that-allows-editing-and-saving-resume-data",
-      "featureTitle": "Replace the placeholder content in `frontend/src/pages/ResumeEditor.tsx` (currently showing “Resume editor coming soon…”) with a functional resume editor UI that allows editing and saving resume data.",
+      "featureId": "feature-fix-the-print-pdf-export-so-the-generated-pdf-contains-the-currently-edited-resume-content-by-ensuring-the-print-view-is-actually-visible-to-the-browser-during-printing-do-not-hide-the-entire-react-root-container-during-media-print",
+      "featureTitle": "Fix the print/PDF export so the generated PDF contains the currently edited resume content by ensuring the print view is actually visible to the browser during printing (do not hide the entire React root/container during @media print).",
       "files": [
-        "frontend/src/components/ResumeEditorForm.tsx",
-        "frontend/src/pages/ResumeEditor.tsx"
+        "frontend/src/index.css",
+        "frontend/src/pages/ResumeEditor.tsx",
+        "frontend/src/utils/pdfExport.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -23,8 +24,8 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-wire-the-resume-editor-ui-to-the-existing-offline-first-persistence-and-sync-logic-by-using-the-existing-hooks-in-frontend-src-hooks-useresumes-ts-e-g-usegetresume-for-loading-and-useupdateresume-for-saving-so-that-edits-update-the-local-resume-immediately-and-sync-to-the-backend-when-authenticated-online",
-      "featureTitle": "Wire the resume editor UI to the existing offline-first persistence and sync logic by using the existing hooks in `frontend/src/hooks/useResumes.ts` (e.g., `useGetResume` for loading and `useUpdateResume` for saving), so that edits update the local resume immediately and sync to the backend when authenticated + online.",
+      "featureId": "feature-fix-draft-handling-in-the-resume-editor-so-the-correct-draft-is-initialized-and-updated-reliably-when-the-loaded-resume-changes-e-g-navigating-between-different-resume-ids-and-ensure-draft-state-cannot-get-stuck-in-a-non-processing-state",
+      "featureTitle": "Fix draft handling in the Resume Editor so the correct draft is initialized and updated reliably when the loaded resume changes (e.g., navigating between different resume IDs) and ensure draft state cannot get stuck in a non-processing state.",
       "files": [
         "frontend/src/hooks/useResumes.ts",
         "frontend/src/pages/ResumeEditor.tsx"
@@ -40,6 +41,52 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-offline-first-draft-syncing-so-queued-draft-resume-operations-are-not-lost-do-not-clear-the-entire-sync-queue-when-one-or-more-operations-fail-and-ensure-only-successfully-processed-operations-are-removed-from-the-queue",
+      "featureTitle": "Fix offline-first draft syncing so queued draft/resume operations are not lost: do not clear the entire sync queue when one or more operations fail, and ensure only successfully processed operations are removed from the queue.",
+      "files": [
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/components/SyncStatusBadge.tsx",
+        "frontend/src/hooks/useResumes.ts",
+        "frontend/src/storage/resumeSyncQueue.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-improve-user-facing-error-handling-for-pdf-export-and-draft-sync-processing-failures-by-displaying-clear-english-error-messages-in-the-ui-when-operations-fail-save-sync-retry-or-print-export",
+      "featureTitle": "Improve user-facing error handling for PDF export and draft/sync processing failures by displaying clear English error messages in the UI when operations fail (save, sync retry, or print/export).",
+      "files": [
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/hooks/useResumes.ts",
+        "frontend/src/pages/ResumeEditor.tsx",
+        "frontend/src/utils/errorMessage.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

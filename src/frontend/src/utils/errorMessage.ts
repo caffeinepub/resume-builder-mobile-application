@@ -17,6 +17,11 @@ export function extractErrorMessage(error: unknown): { userMessage: string; full
       userMessage = 'A resume with this ID already exists';
     } else if (error.message.includes('not found')) {
       userMessage = 'Resume not found';
+    } else if (error.message.includes('Cannot sync')) {
+      userMessage = 'Unable to sync while offline. Changes will sync when you reconnect.';
+    } else if (error.message.includes('partially completed')) {
+      // Keep the detailed partial sync message as-is
+      userMessage = error.message;
     }
   } else if (error && typeof error === 'object') {
     // Handle objects with message property

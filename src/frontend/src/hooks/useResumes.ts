@@ -19,7 +19,7 @@ import {
   useDuplicateBackendResume,
   useRenameBackendResume,
 } from './useQueries';
-import { addToSyncQueue, getSyncQueue, clearSyncQueue } from '../storage/resumeSyncQueue';
+import { addToSyncQueue, getSyncQueue, removeFromSyncQueue } from '../storage/resumeSyncQueue';
 import { extractErrorMessage, isStorageError, getStorageErrorMessage } from '../utils/errorMessage';
 import type { Resume } from '../types/resume';
 
@@ -86,7 +86,6 @@ export function useGetResume(id: string) {
       }
       return localResume;
     },
-    // Don't show stale data briefly - wait for fresh data
     staleTime: 0,
   });
 }
@@ -99,7 +98,6 @@ export function useCreateResume() {
 
   return useMutation({
     mutationFn: async (title: string) => {
-      // Step 1: Always create locally first
       let resume: Resume;
       try {
         resume = createLocalResume(title);
@@ -113,7 +111,6 @@ export function useCreateResume() {
         throw new Error(`Failed to create resume locally: ${userMessage}`);
       }
 
-      // Step 2: Try to sync to backend if authenticated and online
       if (identity && isOnline) {
         try {
           const content = JSON.stringify({ 
@@ -127,14 +124,12 @@ export function useCreateResume() {
           const { userMessage, fullError } = extractErrorMessage(error);
           console.error('Failed to sync resume to backend (will retry later):', fullError);
           
-          // Queue for later sync but don't fail the operation
           addToSyncQueue({ 
             type: 'create', 
             resumeId: resume.id, 
             data: { title, content: resume } 
           });
           
-          // Log warning but don't throw - local creation succeeded
           console.warn('Resume created locally, backend sync queued:', userMessage);
         }
       }
@@ -189,9 +184,7 @@ export function useUpdateResume() {
       }
     },
     onSuccess: (_, resume) => {
-      // Immediately update the cache for the specific resume
       queryClient.setQueryData(['resume', resume.id], resume);
-      // Invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['allResumes'] });
       queryClient.invalidateQueries({ queryKey: ['resume', resume.id] });
     },
@@ -312,9 +305,20 @@ export function useSyncPendingChanges() {
 
   return useMutation({
     mutationFn: async () => {
-      if (!identity || !isOnline) return;
+      if (!identity || !isOnline) {
+        throw new Error('Cannot sync: offline or not authenticated');
+      }
+
       const queue = getSyncQueue();
-      for (const op of queue) {
+      if (queue.length === 0) {
+        return { success: 0, failed: 0 };
+      }
+
+      const successfulIndices: number[] = [];
+      const errors: Array<{ index: number; error: string }> = [];
+
+      for (let i = 0; i < queue.length; i++) {
+        const op = queue[i];
         try {
           switch (op.type) {
             case 'create': {
@@ -326,6 +330,7 @@ export function useSyncPendingChanges() {
                 updatedAt: resume.updatedAt 
               });
               await createBackend.mutateAsync({ resumeId: op.resumeId, title: op.data.title, content });
+              successfulIndices.push(i);
               break;
             }
             case 'update': {
@@ -337,28 +342,55 @@ export function useSyncPendingChanges() {
                 updatedAt: resume.updatedAt 
               });
               await updateBackend.mutateAsync({ resumeId: op.resumeId, content, title: resume.title });
+              successfulIndices.push(i);
               break;
             }
             case 'delete':
               await deleteBackend.mutateAsync(op.resumeId);
+              successfulIndices.push(i);
               break;
             case 'duplicate':
               await duplicateBackend.mutateAsync({ originalId: op.resumeId, newId: op.data.newId });
+              successfulIndices.push(i);
               break;
             case 'rename':
               await renameBackend.mutateAsync({ resumeId: op.resumeId, newTitle: op.data.newTitle });
+              successfulIndices.push(i);
               break;
           }
         } catch (error) {
           const { userMessage, fullError } = extractErrorMessage(error);
-          console.error('Sync error for operation:', op.type, fullError);
-          console.error('Error message:', userMessage);
+          console.error(`Sync error for operation ${op.type}:`, fullError);
+          errors.push({ index: i, error: userMessage });
         }
       }
-      clearSyncQueue();
+
+      // Remove only successful operations from queue
+      if (successfulIndices.length > 0) {
+        removeFromSyncQueue(successfulIndices);
+      }
+
+      const result = {
+        success: successfulIndices.length,
+        failed: errors.length,
+        errors,
+      };
+
+      // If there were failures, throw an error with details
+      if (errors.length > 0) {
+        throw new Error(
+          `Sync partially completed: ${result.success} succeeded, ${result.failed} failed. Failed operations will be retried later.`
+        );
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allResumes'] });
+    },
+    onError: (error) => {
+      const { userMessage } = extractErrorMessage(error);
+      console.error('Sync error:', userMessage);
     },
   });
 }
@@ -370,6 +402,6 @@ export function useStorageStatus() {
   return useQuery({
     queryKey: ['storageStatus'],
     queryFn: () => checkStorageAvailability(),
-    staleTime: 30000, // Check every 30 seconds
+    staleTime: 30000,
   });
 }

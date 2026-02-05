@@ -2,6 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EducationSectionEditor } from './resume/sections/EducationSectionEditor';
+import { ExperienceSectionEditor } from './resume/sections/ExperienceSectionEditor';
+import { SkillsSectionEditor } from './resume/sections/SkillsSectionEditor';
+import { ProjectsSectionEditor } from './resume/sections/ProjectsSectionEditor';
+import { CertificationsSectionEditor } from './resume/sections/CertificationsSectionEditor';
+import { LanguagesSectionEditor } from './resume/sections/LanguagesSectionEditor';
+import { AchievementsSectionEditor } from './resume/sections/AchievementsSectionEditor';
+import { HobbiesSectionEditor } from './resume/sections/HobbiesSectionEditor';
+import { ResumeFormattingPanel } from './resume/ResumeFormattingPanel';
 import type { Resume } from '../types/resume';
 
 interface ResumeEditorFormProps {
@@ -146,6 +156,127 @@ export function ResumeEditorForm({ resume, onChange }: ResumeEditorFormProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Tabbed Sections */}
+      <Tabs defaultValue="experience" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+          <TabsTrigger value="experience">Experience</TabsTrigger>
+          <TabsTrigger value="education">Education</TabsTrigger>
+          <TabsTrigger value="skills">Skills</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
+          <TabsTrigger value="certifications">Certs</TabsTrigger>
+          <TabsTrigger value="languages">Languages</TabsTrigger>
+          <TabsTrigger value="achievements">Awards</TabsTrigger>
+          <TabsTrigger value="hobbies">Hobbies</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="experience" className="mt-6">
+          <ExperienceSectionEditor
+            experience={resume.content.experience}
+            onChange={(experience) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, experience },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="education" className="mt-6">
+          <EducationSectionEditor
+            education={resume.content.education}
+            onChange={(education) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, education },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="skills" className="mt-6">
+          <SkillsSectionEditor
+            skills={resume.content.skills}
+            onChange={(skills) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, skills },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="projects" className="mt-6">
+          <ProjectsSectionEditor
+            projects={resume.content.projects}
+            onChange={(projects) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, projects },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="certifications" className="mt-6">
+          <CertificationsSectionEditor
+            certifications={resume.content.certifications}
+            onChange={(certifications) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, certifications },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="languages" className="mt-6">
+          <LanguagesSectionEditor
+            languages={resume.content.languages}
+            onChange={(languages) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, languages },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="achievements" className="mt-6">
+          <AchievementsSectionEditor
+            achievements={resume.content.achievements}
+            onChange={(achievements) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, achievements },
+              })
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="hobbies" className="mt-6">
+          <HobbiesSectionEditor
+            hobbies={resume.content.hobbies}
+            onChange={(hobbies) =>
+              onChange({
+                ...resume,
+                content: { ...resume.content, hobbies },
+              })
+            }
+          />
+        </TabsContent>
+      </Tabs>
+
+      {/* Formatting Panel */}
+      <ResumeFormattingPanel
+        formatting={resume.formatting}
+        onChange={(formatting) =>
+          onChange({
+            ...resume,
+            formatting,
+          })
+        }
+      />
     </div>
   );
 }

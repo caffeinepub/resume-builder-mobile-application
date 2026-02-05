@@ -1,48 +1,114 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Implement functional offline-first Resume Editor with save flow",
+  "title": "Fix resume PDF export print visibility and improve draft/sync reliability",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Replace ResumeEditor placeholder with an editable form for resume title, personal info, and summary, including explicit save behavior and preserving the existing not-found UI.",
+      "summary": "Ensure PDF/print export includes the currently edited resume by keeping the print view visible during printing while hiding it during normal screen rendering.",
       "acceptanceCriteria": [
-        "Opening `/editor/$resumeId` no longer shows the “coming soon” placeholder text.",
-        "The page renders editable form controls bound to the loaded resume data (at minimum: resume title, personal info, summary).",
-        "Edits can be saved back to local storage via the existing resume update flow (no data loss after refresh).",
-        "If the resume ID does not exist, the existing “Resume not found” state still renders."
+        "Clicking “Download PDF” from the Resume Editor prints/exports a PDF that matches the on-screen preview content for the current draft (including any unsaved edits if the user chooses not to save).",
+        "The print stylesheet no longer hides the entire app root (e.g., #root) such that `.print-only` content is excluded from printing.",
+        "On screen (non-print), the print-only resume view is not visibly rendered (no duplicate resume displayed)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Replace the placeholder UI with a functional editor view: load resume via useGetResume(resumeId), initialize local draft state from the loaded resume, render form controls for title, personal info (e.g., fullName/email/phone/location/linkedin/website), and summary, and add Save/Cancel (or Save) actions that call the existing update flow. Keep the existing loading and “Resume not found” states intact."
+          "description": "Update @media print rules so the React root/container is not hidden during printing (avoid hiding body > * wholesale). Ensure only non-print content is hidden while `.print-only` remains printable. Also add a non-print rule to hide `.print-only` on screen to prevent duplicate rendering."
         },
         {
-          "path": "frontend/src/components/ResumeEditorForm.tsx",
-          "operation": "create",
-          "description": "Create a reusable ResumeEditorForm component that renders the resume edit fields and emits updated draft values. Compose existing shadcn-ui components (e.g., Card, Button, Input, Label, Textarea) rather than editing anything under frontend/src/components/ui. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "operation": "modify",
+          "description": "Ensure the print-only ResumePrintView is always rendered with the current in-memory draft used for the on-screen preview (including unsaved edits), and keep screen-only UI hidden via existing `print:hidden` patterns so printing picks the correct content."
+        },
+        {
+          "path": "frontend/src/utils/pdfExport.ts",
+          "operation": "modify",
+          "description": "Add defensive checks/error surfacing around invoking browser print (e.g., validate required resume fields/title, handle runtime errors) to avoid silent failures and support REQ-4 error messaging integration."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Wire the resume editor to the existing offline-first persistence + sync logic using useGetResume for loading and useUpdateResume for saving, ensuring immediate local updates and backend sync when authenticated + online.",
+      "summary": "Make Resume Editor draft initialization/reset reliable when switching between resumes and prevent the editor from getting stuck with null/blank draft state after data is fetched.",
       "acceptanceCriteria": [
-        "After editing and saving, the Resumes Dashboard reflects the updated resume content (e.g., updated title/summary and updated timestamp where applicable) without requiring a hard reload.",
-        "When offline (or unauthenticated), saving still works locally.",
-        "When authenticated and online, saving triggers backend update via the existing sync path (no new backend endpoints required)."
+        "Opening Resume A, then navigating to Resume B loads and edits Resume B (draft is reset/reinitialized appropriately) and does not keep Resume A content.",
+        "The editor does not render a blank/null state indefinitely once the resume query has returned data.",
+        "After saving, the UI correctly reflects “All changes saved” and subsequent edits re-enable the save state as expected."
       ],
       "file_operations": [
         {
+          "path": "frontend/src/pages/ResumeEditor.tsx",
+          "operation": "modify",
+          "description": "Refactor draft lifecycle: reinitialize draft (and reset `hasChanges`) whenever the loaded resume ID/content changes; avoid conditioning initialization on `!draft` so navigation between resume IDs cannot keep stale draft. Replace the `if (!draft) return null;` branch with a non-stuck fallback (loader or error UI) once the resume query is fetched."
+        },
+        {
           "path": "frontend/src/hooks/useResumes.ts",
           "operation": "modify",
-          "description": "Enhance useUpdateResume to more clearly support editor-driven updates without requiring hard reloads by ensuring react-query caches are updated/invalidation happens appropriately after a save (e.g., keep invalidations and optionally add immediate cache updates for ['resume', id] and ['allResumes']). This must continue to use the existing offline-first local save + queued sync behavior, and must not require any new backend capability."
+          "description": "Adjust resume fetching/caching behavior as needed to prevent brief stale resume data when navigating between IDs (e.g., ensure the query key and query behavior return the correct resume and do not preserve previous resume content unexpectedly)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Fix offline-first sync queue processing so failed operations remain queued and only successful operations are removed; update last-sync time only on full success.",
+      "acceptanceCriteria": [
+        "If syncing pending changes and a backend operation fails, the failed operation(s) remain in the local sync queue for retry (they are not discarded).",
+        "If syncing pending changes and operations succeed, those successful operation(s) are removed from the queue and the UI reflects reduced pending changes accordingly.",
+        "A full successful sync run clears the queue and updates the stored last-sync time."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/storage/resumeSyncQueue.ts",
+          "operation": "modify",
+          "description": "Extend sync-queue utilities to support partial removal (remove only successfully processed operations) and to update last-sync time only when the queue is fully cleared due to success. Add a lightweight change-notification mechanism (e.g., dispatch a window event) so UI can react to queue updates."
         },
+        {
+          "path": "frontend/src/hooks/useResumes.ts",
+          "operation": "modify",
+          "description": "Update `useSyncPendingChanges` to process the queue while retaining failed operations, removing only successful ones, and only calling last-sync update when all operations succeed. Ensure the mutation reports partial-failure state without discarding queued changes."
+        },
+        {
+          "path": "frontend/src/components/SyncStatusBadge.tsx",
+          "operation": "modify",
+          "description": "Make the badge reactive to sync queue/last-sync changes (e.g., listen for the sync-queue change event or use state polling) so pending count and last sync time update immediately after successful/partial sync runs."
+        },
+        {
+          "path": "frontend/src/components/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Ensure the automatic sync trigger on reconnect continues to run safely with the updated partial-success behavior (e.g., do not suppress retries when prior run had failures; avoid getting stuck in a non-processing state)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add clear, user-facing English error messages for save, sync, and PDF export/print failures while keeping the app usable.",
+      "acceptanceCriteria": [
+        "When saving a resume fails, the user sees an actionable English error message (not just a console error).",
+        "When sync processing encounters errors, the user is informed that some changes are still pending and will be retried (without losing data).",
+        "When initiating PDF export/print fails (e.g., due to missing draft), the user sees an English error message and the app remains usable."
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/pages/ResumeEditor.tsx",
           "operation": "modify",
-          "description": "Connect the editor Save action to useUpdateResume (mutate/mutateAsync) so that saving always persists locally immediately and triggers the existing sync path when authenticated + online. Ensure the editor uses the loaded resume as the source of truth on initial load, and updates the UI state after successful save so that returning to the dashboard reflects changes without a hard reload."
+          "description": "Improve error handling UX: show clear English messages when save fails and when PDF export cannot start (e.g., missing draft), using existing toast/alert patterns; ensure errors do not leave the page in a broken state."
+        },
+        {
+          "path": "frontend/src/hooks/useResumes.ts",
+          "operation": "modify",
+          "description": "Improve sync/save error propagation: when sync processing has partial failures, surface a user-facing message indicating some changes are still pending and will retry; ensure save failures throw actionable messages already extracted via `extractErrorMessage`."
+        },
+        {
+          "path": "frontend/src/components/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Handle sync mutation errors with a user-facing message (e.g., toast) indicating retry behavior; ensure the rest of the UI remains usable and that repeated reconnects can re-attempt syncing."
+        },
+        {
+          "path": "frontend/src/utils/errorMessage.ts",
+          "operation": "modify",
+          "description": "Refine user-friendly message extraction/mapping for common sync/save/print failure cases so UI can consistently display clear English messages (without relying on console-only errors)."
         }
       ]
     }

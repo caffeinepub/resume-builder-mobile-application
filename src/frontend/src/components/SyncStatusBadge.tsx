@@ -1,19 +1,37 @@
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { getLastSyncTime, getSyncQueue } from '../storage/resumeSyncQueue';
+import { getLastSyncTime, getSyncQueue, onSyncQueueChange } from '../storage/resumeSyncQueue';
 import { Badge } from '@/components/ui/badge';
 import { Cloud, CloudOff, Clock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useState, useEffect } from 'react';
 
 export default function SyncStatusBadge() {
   const { identity } = useInternetIdentity();
   const isOnline = useOnlineStatus();
   const isAuthenticated = !!identity;
 
-  if (!isAuthenticated) return null;
+  // Local state to track sync queue changes
+  const [pendingCount, setPendingCount] = useState(0);
+  const [lastSync, setLastSync] = useState<number | null>(null);
 
-  const pendingCount = getSyncQueue().length;
-  const lastSync = getLastSyncTime();
+  // Update state when sync queue changes
+  useEffect(() => {
+    const updateState = () => {
+      setPendingCount(getSyncQueue().length);
+      setLastSync(getLastSyncTime());
+    };
+
+    // Initial update
+    updateState();
+
+    // Listen for changes
+    const unsubscribe = onSyncQueueChange(updateState);
+
+    return unsubscribe;
+  }, []);
+
+  if (!isAuthenticated) return null;
 
   const getTimeAgo = (timestamp: number | null) => {
     if (!timestamp) return 'Never';
